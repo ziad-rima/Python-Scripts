@@ -1,32 +1,34 @@
+import json
+
 # TO-DO list script 
 
 # App Overview:
 
-# 1. Add tasks to a to-do list
-# 2. View all tasks
-# 3. Clear all tasks
-# 4. Keep the list saved in a file
+# . Add tasks to a to-do list
+# . Do some stuff
+# . Keep the list saved in a file (JSON format)
 
-
-# the users see four options: 
-    # 1. Add a task (should click the number 1)
-    # 2. View all tasks (should click the number 2)
-    # 3. Clear all tasks (should click the number 3)
-    # 4. Clear a specific task (should click number 4)
-    # 5. Mark tasks as done (should click number 5)
-    # 6. Quit (should click the number 6)
 
 # We'll start by writing out the functions: 
 
 # Add task function:
 
 def add_task():
-    """Add a task to your list"""
-    task = input("Enter the task you want to add: ")
-    with open("to_do_list.txt", "a") as file:
-        file.write(task + "\n")
-    print("Task added successfully.")
+    try:
+        with open("to_do_list.json", "r") as file:
+            dictionary = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        dictionary = {}
+    task = input("Enter your task: ")
+    category = input("Enter the category of the task: ").lower()
 
+    if category not in dictionary:
+        dictionary[categroy] = []
+    dictionary[category].append(task)
+
+    with open("to_do_list.json", "w") as file:
+        json.dump(dictionary, file, indent=4)
+    print("Task added successfully.")    
 
 # View all tasks function: 
 
