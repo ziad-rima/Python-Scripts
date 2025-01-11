@@ -20,10 +20,10 @@ def add_task():
     except (FileNotFoundError, json.JSONDecodeError):
         dictionary = {}
     task = input("Enter your task: ")
-    category = input("Enter the category of the task: ").lower()
+    category = input("Enter the category of the task: ").upper()
 
     if category not in dictionary:
-        dictionary[categroy] = []
+        dictionary[category] = []
     dictionary[category].append(task)
 
     with open("to_do_list.json", "w") as file:
@@ -35,18 +35,17 @@ def add_task():
 # We should handle the case where the list is either empty or doesn't exist.
 
 def view_tasks():
-    """View all tasks you added"""
     try:
-        with open("to_do_list.txt", "r") as file:
-            tasks = file.readlines()
-            if tasks:
+        with open("to_do_list.json", "r") as file:
+            dictionary = json.load(file)
+            if dictionary:
                 print("\nYour to-do list:")
-                for i, task in enumerate(tasks, 1):
-                    print(f"{i}. {task.strip()}")
+                for category, tasks in dictionary.items():
+                    print(f"\n{category}:\n{tasks}")
             else: 
                 print("\nYour list is empty.")
-    except FileNotFoundError:
-        print("\nList doesn't exist, add a task to create one.")
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("\nList is empty.")
 
 
 #Clear all tasks
@@ -59,16 +58,16 @@ def clear_all_tasks():
     try:
         confirm = input("Are you sure you want to clear all tasks? (y/n): ").lower()
         if confirm == "y":
-            with open("to_do_list.txt", "r") as file:
-                tasks = file.readlines()
-                if not(tasks):
+            with open("to_do_list.json", "r") as file:
+                dictionary = json.load(file) 
+                if not dictionary:
                     print("\nYour list is already empty.")
                 else:
-                    open("to_do_list.txt", "w").close()
+                    open("to_do_list.json", "w").close()
                     print("\nAll tasks are cleard.")
         else:
             print("\nClear operation canceled.")
-    except FileNotFoundError:
+    except (FileNotFoundError, json.JSONDecodeError):
         print("\nNo to-do list was found.")
 
 
