@@ -77,23 +77,34 @@ def clear_all_tasks():
 
 def clear_task():
     try:
-        view_tasks()
-        with open("to_do_list.txt", "r") as file:
-            tasks = file.readlines()
-            if (not(tasks)):
+        with open("to_do_list.json", "r") as file:
+            dictionary = json.load(file)
+            if not dictionary:
                 print("\nYour to-do list is empty.")
+                return
             while True:
                 try: 
-                    task_index = int(input("\nChoose the task number to delete: "))
-                    if 1 <= task_index <= len(tasks):
-                        break
+                    i = 1
+                    for category, tasks in dictionary.items():
+                        print(f"{i}. {category}: {tasks}")
+                        i = i + 1
+                    category_index = int(input("\nEnter the category number to delete the task from: "))
+                    if 1 <= category_index <= len(dictionary):
+                        category_tasks = list(dictionary.values())[category_index]
+                        for j, task in enumerate(category_tasks, 1):
+                            print(f"{j}. {task}")
+                        task_index = int(input("\nEnter the number of the task you want to delete: "))
+                        if 1 <= task_index <= len(category_tasks):
+                            break
+                        else:
+                            print("\nEnter a valid integer.")
                     else: 
-                        print(f"Please enter a number between 1 and {len(tasks)}.")
+                        print(f"Please enter a number between 1 and {len(dictionary)}.")
                 except ValueError: 
                     print("\nInvalid input. Please enter a number.")
-            del tasks[task_index - 1]
+            del category_tasks[task_index - 1]
             print("\nTask deleted successfully.")
-            with open("to_do_list.txt", "w") as file:
+            with open("to_do_list.json", "w") as file:
                 file.writelines(tasks)
             view_tasks()
     except FileNotFoundError:
