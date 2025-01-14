@@ -90,24 +90,27 @@ def clear_task():
                         i = i + 1
                     category_index = int(input("\nEnter the category number to delete the task from: "))
                     if 1 <= category_index <= len(dictionary):
-                        category_tasks = list(dictionary.values())[category_index]
+                        category_tasks = list(dictionary.values())[category_index - 1]
                         for j, task in enumerate(category_tasks, 1):
                             print(f"{j}. {task}")
                         task_index = int(input("\nEnter the number of the task you want to delete: "))
                         if 1 <= task_index <= len(category_tasks):
                             break
                         else:
-                            print("\nEnter a valid integer.")
+                            print(f"\nEnter a number between 1 and {len(category_tasks)}.")
                     else: 
                         print(f"Please enter a number between 1 and {len(dictionary)}.")
                 except ValueError: 
                     print("\nInvalid input. Please enter a number.")
             del category_tasks[task_index - 1]
+            categories = list(dictionary.keys())
+            name_of_category = categories[category_index - 1]
+            dictionary.update({f"{name_of_category}": category_tasks})
             print("\nTask deleted successfully.")
             with open("to_do_list.json", "w") as file:
-                file.writelines(tasks)
+                json.dump(dictionary, file, indent = 4)
             view_tasks()
-    except FileNotFoundError:
+    except (FileNotFoundError, json.JSONDecodeError):
         print("\nTo-Do list doesn't exist, add a task to create one.")
 
 
