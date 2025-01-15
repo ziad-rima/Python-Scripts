@@ -105,6 +105,9 @@ def clear_task():
             del category_tasks[task_index - 1]
             categories = list(dictionary.keys())
             name_of_category = categories[category_index - 1]
+            if not category_tasks:
+                del dictionary[name_of_category]
+                print(f"\nThe '{name_of_category}' category has been removed as it is now empty.")
             dictionary.update({f"{name_of_category}": category_tasks})
             print("\nTask deleted successfully.")
             with open("to_do_list.json", "w") as file:
