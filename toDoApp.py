@@ -124,19 +124,27 @@ def clear_task():
 
 def mark_done():
     try:
-        view_tasks()
-        with open ("to_do_list.txt", "r") as file:
-            tasks = file.readlines()
-            if not(tasks):
+        with open ("to_do_list.json", "r") as file:
+            dictionary = json.load(file)
+            if not dictionary:
                 print("\nYour list is empty.")
                 return 
             while True:
                 try:
-                    task_indices = input("\nEnter the numbers associated with the tasks you want marked as done (comma separated): ") # eg: 1, 3, 4
-                    task_indices = [int(index.strip()) for index in task_indices.split(",")] # task_indices.split(",") results in an array containing strings ["1", " 3", " 4"]
+                    j = 1
+                    for category, tasks in dictionary.items():
+                        print(f"\n{j}. {category}: {tasks}")
+                        j = j + 1
+                    category_index = int(input("\nEnter the category number from which you want mark tasks as done: "))
+                    if 1 <= category_index <= len(dictionary):
+                        category_tasks = list(dictionary.values())[category_index - 1]
+                        for i, tasks in enumerate(category_tasks, 1):
+                            print(f"\n{i}. {tasks}")
+                        task_indices = input("\nEnter the numbers associated with the tasks you want marked as done (comma separated): ") # eg: 1, 3, 4
+                        task_indices = [int(index.strip()) for index in task_indices.split(",")] # task_indices.split(",") results in an array containing strings ["1", " 3", " 4"]
                                                                                             # int(index.strip()) takes each string in task_indices and removes whitespaces and turns it into an integer
                                                                                                                                                                                 # [1, 3, 4]
-                    if all (1 <= index <= len(tasks) for index in task_indices):
+                    if all (1 <= index <= len(category_tasks) for index in task_indices):
                         break
                     else:
                         print("\nEnter valid task numbers separated by commas (e.g., 1, 2, 3).")
@@ -144,12 +152,15 @@ def mark_done():
                     print("\nInvalid input, please enter an integer")
             
             for index in task_indices:
-                tasks[index - 1] = tasks[index - 1].strip() + " (DONE)\n"
+                category_tasks[index - 1] = category_tasks[index - 1].strip() + " (DONE)"
             print("\nTasks marked done successfully.")
-            with open("to_do_list.txt", "w") as file:
-                file.writelines(tasks)
+            categories = list(dictionary.keys())
+            name_of_category = categories[category_index - 1]
+            dictionary[name_of_category] = category_tasks
+            with open("to_do_list.json", "w") as file:
+                json.dump(dictionary, file, indent=4)
             view_tasks()
-    except FileNotFoundError:
+    except (FileNotFoundError, json.JSONDecodeError):
         print("\nYour To-Do list is not found, add a task to create one.")
 
 #Main function (or the user's interface):
